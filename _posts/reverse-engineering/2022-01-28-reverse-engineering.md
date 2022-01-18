@@ -15,51 +15,51 @@ So as always first let's check what file type it is.
 
 We can see this is a ELF 64-bit binary, and it is stripped.
 
-![Untitled](GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled.png)
+![Untitled](/assets/GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled.png)
 
 Before running the binary let's see if there is any juicy hard-coded strings.
 
 There is no juicy information. But we see some readable strings.
 
-![Untitled](GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%201.png)
+![Untitled](/assets/GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%201.png)
 
 When executing the binary we see that it asks for a secret.
 
-![Untitled](GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%202.png)
+![Untitled](/assets/GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%202.png)
 
 And we also see that the secret is 28 charters long. 
 
-![Untitled](GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%203.png)
+![Untitled](/assets/GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%203.png)
 
 When giving the wrong secret it just gives a fail message. So let's decompile and take a look at the inside of the binary.
 
-![Untitled](GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%204.png)
+![Untitled](/assets/GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%204.png)
 
 Let's open the binary in Ghidra. And open the code browser.
 
-![Untitled](GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%205.png)
+![Untitled](/assets/GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%205.png)
 
 We some functions in the binary. So let's find the main fucntion.
 
 Usually the entry functions will call the next function it wants to load(main). So let's see what's in entry.
 
-![Untitled](GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%206.png)
+![Untitled](/assets/GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%206.png)
 
 We see `__libc_start_main` takes one function(`FUN_001012c3()`) as it's argument . And that is our main function.
 
-![Untitled](GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%207.png)
+![Untitled](/assets/GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%207.png)
 
 The main function takes one argument which is our input. When the length of our input is `0x1c(28)` characters long, the input goes into another function (`FUN_001011e()`). The return state of that function is saved. And based on the return state if it is 0 (no errors) then it'll give us the success message.
 
-![Untitled](GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%208.png)
+![Untitled](/assets/GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%208.png)
 
 The function `FUN_001011e()` calls another function called `FUN_00101189()` inside it.
 
-![Untitled](GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%209.png)
+![Untitled](/assets/GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%209.png)
 
 This function isn't doing much.
 
-![Untitled](GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%2010.png)
+![Untitled](/assets/GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%2010.png)
 
 Code explanation
 
@@ -83,17 +83,17 @@ void * FUN_00101189(void)
 
 Inside the location `&DAT_00102020` we find some data which looks like array. Let's convert the data type into Dword. The reason for this is, usually we'll copy the bytes and try to filter the `\x00` padding. But if there is any zeros value in the array it'll make us miss that zero value while filtering out. So let's convert the data type and see if there is any zero values.
 
-![Untitled](GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%2011.png)
+![Untitled](/assets/GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%2011.png)
 
 As expected there is a zero value. This means we should add a zero value in the array after filtering the padding.
 
-![Untitled](GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%2012.png)
+![Untitled](/assets/GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%2012.png)
 
 let's copy these data and see if we can make any sense from it.
 
 We can copy this piece of data as python list by selecting the whole location and right clicking on the location and choosing Copy Special. Choose python list from the options.
 
-![Untitled](GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%2013.png)
+![Untitled](/assets/GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%2013.png)
 
 Now let's recreate this scene in python.
 
@@ -112,7 +112,7 @@ data_loc = [i^0x12 for i in data_loc] #[4, 24, 13, 2, 10, 9, 27, 25, 12, 17, 26,
 
 We got a result whose length is 28 chars long just as the secret we expected. But it isn't giving any meaningful data.
 
-![Untitled](GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%2014.png)
+![Untitled](/assets/GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%2014.png)
 
 Let's go back to the main function.
 
@@ -125,7 +125,7 @@ if the first value `FUN_001011c8(`) returns is 12, then the logic will look some
 > pvVar1[0] = param_1[12] (input) + 4 (increase the ascii value of that character)
 > 
 
-![Untitled](GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%2015.png)
+![Untitled](/assets/GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%2015.png)
 
 Just to be clear:
 
@@ -140,11 +140,11 @@ Let's convert the data type and check for zero values, then get the values from 
 
 As seen below there is no zero values.
 
-![Untitled](GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%2016.png)
+![Untitled](/assets/GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%2016.png)
 
 Again we can copy this data as python list and manually. We already have the shuffle order that we got from `FUN_00101169()`. Now we have everything we need to reverse this function.
 
-![Untitled](GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%2017.png)
+![Untitled](/assets/GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%2017.png)
 
 So with the following script we can get the flag.
 
@@ -177,8 +177,8 @@ for i in range(len(data_loc)):
 print ("".join([chr(i) for i in flag]))
 ```
 
-![Untitled](GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%2018.png)
+![Untitled](/assets/GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%2018.png)
 
 We can verify the flag with the binary
 
-![Untitled](GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%2019.png)
+![Untitled](/assets/GoldDigger%20d2cb872b708641b8aae6b6d8db77af0d/Untitled%2019.png)
