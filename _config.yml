@@ -1,18 +1,18 @@
 # Site settings
 title: Archive of malformX # site title
 description: >- # site description
-  Just a site mainly focused on cyber stuff. But you may also find some ridiculous rants. Be prepared :) 
+  Just a site mainly focused on cyber stuff. But you may also find some ridiculous rants :) 
 lang: en-US # default lang
 timezone: Asia/Kolkata # set your timezone
 image: assets/img/ogp.png # This image used for Open Graph more info https://ogp.me/
-repo: https://github.com/piharpi/jekyll-klise # site repo [optional]
+# repo: https://github.com/piharpi/jekyll-klise # site repo [optional]
 mode: dark # default theme "dark" | "light"
 
 # Profile settings
 author:
   name: malformX # author name
   bio: >- # tell to the world
-    Well, buy me beer if you like my contents.
+    Well, buy me a beer if you like my contents.
   username: malformX # general username
   github: malformx # github username
   twitter: malf0rmx # twitter username
