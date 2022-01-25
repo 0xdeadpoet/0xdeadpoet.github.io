@@ -1,5 +1,5 @@
 ---
-title: Colophon
+title: About
 permalink: /about/
 layout: page
 excerpt: Will post all kind of rants.
